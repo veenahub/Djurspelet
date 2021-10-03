@@ -1,16 +1,16 @@
 package com.example.djurspelet;
 
 public enum FoodEnum {
-	Milk(100), Leaves(200), Carrot(300), Chicken(400), Meat(500);
+    Milk(10), Leaves(20), Carrot(10), Chicken(20), Meat(30);
 
-	private int kgFoodPrice;
+    private int kgFoodPrice;
 
-	FoodEnum(int kgFoodPrice) {
-		this.kgFoodPrice = kgFoodPrice;
-	}
+    FoodEnum(int kgFoodPrice) {
+        this.kgFoodPrice = kgFoodPrice;
+    }
 
-	public int getKGFoodPrice() {
-		return kgFoodPrice;
-	}
+    public int getKGFoodPrice() {
+        return kgFoodPrice;
+    }
 
 }

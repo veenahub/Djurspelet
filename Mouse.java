@@ -2,17 +2,25 @@ package com.example.djurspelet;
 
 import java.util.Random;
 
-public class Mouse extends Animal{
+public class Mouse extends Animal {
     final float price = 20.00f;
-    public Mouse(String name, float health,char gender) {
-        super(name,health,gender);
+
+    public Mouse(String name, float health, char gender) {
+        super(name, health, gender);
     }
+
     public float getPrice() {
         return price;
     }
-    public void feed(Food food) {
 
+    public void feed(Food food) {
+        int foodKgs = food.getKGFoodPrice();
+        health = foodKgs * 10;
+        if (health > 100.0f) {
+            health = 100.0f;
+        }
     }
+
     public Animal mate(Animal other) {
 
         Animal animal = null;
@@ -21,9 +29,9 @@ public class Mouse extends Animal{
 
                 if (new Random().nextInt(2) == 0) {
                     if (new Random().nextInt(2) == 0) {
-                        animal = new Mouse("Dog", 100.00F, 'F');
+                        animal = new Mouse("Mouse", 100.00F, 'm');
                     } else {
-                        animal = new Mouse("Dog", 100.00F, 'F');
+                        animal = new Mouse("Mouse", 100.00F, 'f');
 
                     }
 
@@ -31,7 +39,7 @@ public class Mouse extends Animal{
 
             }
         }
-        if(animal!=null) {
+        if (animal != null) {
             System.out.println("A New animal is born!");
         }
         return animal;

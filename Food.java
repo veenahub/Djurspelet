@@ -1,15 +1,20 @@
 package com.example.djurspelet;
 
-public  abstract class Food {
+public abstract class Food {
 
-	private int weightInKgs;
+    private int weightInKgs;
 
-	public Food(int weightinkgs) {
-		weightInKgs=weightinkgs;
-	}
-	public abstract int getKGFoodPrice();
-	
-	public int getweightInKgs() {
-		return weightInKgs;
-	}
+    public Food(int weightinkgs) {
+        weightInKgs = weightinkgs;
+    }
+
+    public abstract int getKGFoodPrice();
+
+    public int getweightInKgs() {
+        return weightInKgs;
+    }
+
+    public void addweightInKgs(int addKgs) {
+        weightInKgs = weightInKgs + addKgs;
+    }
 }

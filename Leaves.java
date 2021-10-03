@@ -2,14 +2,14 @@ package com.example.djurspelet;
 
 public class Leaves extends Food {
 
-	public Leaves(int weightinkgs) {
-		super(weightinkgs);
-		// TODO Auto-generated constructor stub
-	}
+    public Leaves(int weightinkgs) {
+        super(weightinkgs);
+        // TODO Auto-generated constructor stub
+    }
 
-	@Override
-	public int getKGFoodPrice() {
-		return 50;
-	}
+    @Override
+    public int getKGFoodPrice() {
+        return 20;
+    }
 
 }
