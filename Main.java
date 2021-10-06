@@ -1,4 +1,4 @@
-package com.example.djurspelet;
+package djurspelet;
 
 public class Main {
     public static void main(String[] args) {

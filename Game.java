@@ -1,4 +1,4 @@
-package com.example.djurspelet;
+package djurspelet;
 
 import java.util.Scanner;
 
@@ -16,6 +16,11 @@ public class Game {
             for (this.i = 0; this.i < noOfPlayers; this.i++) {
                 if(j == 0) {
                     player[this.i] = new Player("Player" + this.i, 1000.00f);
+                } else {
+                    System.out.println("\n\nRound:"+j+" started.");
+                    player[this.i].informDeadAnimals();
+                    player[this.i].userAnimalList();
+                    player[this.i].informFoodDetails();
                 }
                 System.out.println("Hi " + player[this.i].getName() + " you have " + player[this.i].getMoney() + " sek\n" +
                         "What you want to choose?\n" +
@@ -55,13 +60,6 @@ public class Game {
                             player[this.i].mateAnimals(pet);
 
                         }
-                        /*
-                         * Animal animal1 = player.getAnimals().get(1); Animal animal2 =
-                         * player.getAnimals().get(2); try { Optional<Animal> animal =
-                         * animal1.mate(animal2); animal.ifPresent(s -> player.getAnimals().add(s)); }
-                         * catch (CustomException e) { // TODO Auto-generated catch block
-                         * e.printStackTrace(); }
-                         */
 
                         break;
                     case 5:
@@ -71,7 +69,7 @@ public class Game {
                 }
             }
 
-            for (this.i = 0; this.i < noOfPlayers; this.i++) {
+            for (this.i =0; this.i < noOfPlayers; this.i++) {
 
                 player[this.i].endOfRound();
             }
@@ -81,7 +79,7 @@ public class Game {
     public void getNoOfRounds() {
         System.out.println("How many rounds you want to play?");
         noOfRounds = userInput.nextInt();
-        if (!(noOfRounds >= 1 && noOfRounds <= 30)) {
+        if (!(noOfRounds >=5 && noOfRounds <= 30)) {
             System.out.println("Please Enter The Number between 5 to 30");
             noOfRounds = userInput.nextInt();
         }

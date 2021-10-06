@@ -1,12 +1,13 @@
-package com.example.djurspelet;
+package djurspelet;
 
 import java.util.Random;
+import java.util.Scanner;
 
 public class Horse extends Animal {
     final float price = 300.00f;
 
     public Horse(String name, float health, char gender) {
-        super(name, health, gender);
+        super(name, health, gender, AnimalType.HORSE);
     }
 
     public float getPrice() {
@@ -25,22 +26,21 @@ public class Horse extends Animal {
 
         Animal animal = null;
         if (other instanceof Horse) {
-            if (Character.compare(this.getGender(), other.getGender()) != 0) {
+            if (this.getGender() != other.getGender()) {
 
                 if (new Random().nextInt(2) == 0) {
                     if (new Random().nextInt(2) == 0) {
-                        animal = new Horse("Dog", 100.00F, 'm');
+                        System.out.println("A New male animal is born! Enter the name of the animal:");
+                        String animalName = new Scanner(System.in).next().toLowerCase();
+                        animal = new Horse(animalName, 100.00F, 'm');
                     } else {
-                        animal = new Horse("Dog", 100.00F, 'f');
+                        System.out.println("A New female animal is born! Enter the name of the animal:");
+                        String animalName = new Scanner(System.in).next().toLowerCase();
+                        animal = new Horse(animalName, 100.00F, 'f');
 
                     }
-
                 }
-
             }
-        }
-        if (animal != null) {
-            System.out.println("A New animal is born!");
         }
         return animal;
     }

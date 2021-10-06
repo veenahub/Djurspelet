@@ -1,8 +1,9 @@
-package com.example.djurspelet;
+package djurspelet;
 
 import java.lang.String;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
@@ -11,8 +12,7 @@ public class Player {
     private String name;
     private float money;
     Store store = new Store();
-    Animal animal;
-    float animalPrice;
+
     Milk milkAvailable = new Milk(0);
     Leaves leavesAvailable = new Leaves(0);
     Carrot carrotsAvailable = new Carrot(0);
@@ -30,30 +30,102 @@ public class Player {
     }
 
     public void chooseAnimal() {
-        animal = store.buyAnimal();
-        animalPrice = animal.getPrice();
-        System.out.println(" your chosen animal price is : " + animalPrice);
-        float RemainingMoney = (money - animalPrice);
+        Scanner userInput = new Scanner(System.in);
+
+        System.out.println("we have Dog,Cat,Horse,Rabbit,Mouse \n" + "Please write here which animal you want to buy?");
+        String pet = userInput.next().toLowerCase();
+        System.out.println("Choose which gender you want 1.Female 2.Male ");
+        int gender = userInput.nextInt();
+        System.out.println("How many you want:");
+        int countOfAnimals = userInput.nextInt();
+        List<String> animalNames = new ArrayList<>();
+        for (int i = 1; i <= countOfAnimals; i++) {
+            String animalName = null;
+            do {
+                System.out.println("What is the name of the Animal-" + i + ":");
+                String name = userInput.next().toLowerCase();
+                for (Animal animal : UserAnimalList) {
+                    if (animal.getName().equalsIgnoreCase(name)) {
+                        System.out.println("An animal with the name already exists. Please select another name.");
+                        name = null;
+                        break;
+                    }
+                }
+                if(animalNames.contains(name)) {
+                    System.out.println("An animal with the name already exists. Please select another name.");
+                    name = null;
+                }
+                if (name != null) {
+                    animalName = name;
+                }
+
+            } while (animalName == null);
+            animalNames.add(animalName);
+        }
+
+
+
+        List<Animal> newAnimals = store.buyAnimal(pet, gender, animalNames, countOfAnimals);
+        Animal animal = newAnimals.get(0);
+        float animalPrice = animal.getPrice();
+        System.out.println(" your chosen animal price is : " + animalPrice + ", You have successfully purchased " + newAnimals.size() + " animals." );
+        float RemainingMoney = (money - (animalPrice*newAnimals.size()));
         money = RemainingMoney;
         System.out.println("your Remaining amount " + money);
-        UserAnimalList.add(animal);
+        UserAnimalList.addAll(newAnimals);
+
+        if (newAnimals.size() > 0) {
+            System.out.println("Do you want to buy more Animals? (y/n)");
+            String buyMoreAnimals = userInput.next().toLowerCase();
+            if ("y".equalsIgnoreCase(buyMoreAnimals)) {
+                chooseAnimal();
+            }
+        }
+
     }
 
     public void userAnimalList() {
         System.out.println("your  animals list");
         for (Animal animal : UserAnimalList) {
-            if(animal.getHealth() > 0) {
-                String userchoice = animal.getName() + ", Gender:" + animal.getGender() + ", Health:" + animal.getHealth();
-                //int length_of_the_string = userchoice.length();
-                System.out.println(userchoice);//.substring(23, length_of_the_string));
+            if (animal.getHealth() > 0) {
+                String userchoice = animal.getName() + ", Gender:" + animal.getGender() + ", Health:"
+                        + animal.getHealth() + ", Change from Previous round: -" + (animal.getPreviousRoundHealth()-animal.getHealth()) + "%";
+                // int length_of_the_string = userchoice.length();
+                System.out.println(userchoice);// .substring(23, length_of_the_string));
             }
         }
     }
 
-    public Animal userAnimal(String animalType, String gender) {
+    public void informFoodDetails() {
+        if(milkAvailable.getweightInKgs() == 0 && leavesAvailable.getweightInKgs() == 0 &&
+                carrotsAvailable.getweightInKgs() == 0 && chickenAvailable.getweightInKgs() == 0 && meatAvailable.getweightInKgs() == 0) {
+            System.out.println("No food available.");
+        } else {
+            System.out.println("your available food details:");
+            if(milkAvailable.getweightInKgs() > 0) {
+                System.out.println("Milk = "+ milkAvailable.getweightInKgs() + " kgs");
+            }
+            if(leavesAvailable.getweightInKgs() > 0) {
+                System.out.println("Leaves = "+ leavesAvailable.getweightInKgs() + " kgs");
+            }
+            if(carrotsAvailable.getweightInKgs() > 0) {
+                System.out.println("Carrots = "+ carrotsAvailable.getweightInKgs() + " kgs");
+            }
+            if(chickenAvailable.getweightInKgs() > 0) {
+                System.out.println("Chicken = "+ chickenAvailable.getweightInKgs() + " kgs");
+            }
+            if(meatAvailable.getweightInKgs() > 0) {
+                System.out.println("Meat"+ meatAvailable.getweightInKgs() + " kgs");
+            }
+        }
+
+    }
+
+    public Animal userAnimal(AnimalType animalType, String gender) {
         for (Animal animal : UserAnimalList) {
-            String userchoice = animal.getName();
-            if (animalType.equalsIgnoreCase(userchoice) && gender.equalsIgnoreCase(String.valueOf(animal.getGender()))) {
+            AnimalType userchoice = animal.getAnimalType();
+            if (animalType == userchoice
+                    && gender.equalsIgnoreCase(String.valueOf(animal.getGender()))) {
                 return animal;
             }
         }
@@ -62,17 +134,17 @@ public class Player {
 
     public boolean animalsToMate() {
         System.out.println("Animals that can mate:");
-        Map<String, String> animalAndGenderMap = new HashMap<>();
+        Map<AnimalType, String> animalAndGenderMap = new HashMap<>();
         boolean canAnimalsMate = false;
 
         for (Animal animal : UserAnimalList) {
-            String userchoice = animal.getName();
+            AnimalType userchoice = animal.getAnimalType();
 
             if (animalAndGenderMap.containsKey(userchoice)) {
                 String existingAnimalGender = animalAndGenderMap.get(userchoice);
                 if (!String.valueOf(animal.getGender()).equals(existingAnimalGender)) {
-                    //int length_of_the_string = userchoice.length();
-                    System.out.println(userchoice);//.substring(23, length_of_the_string));
+                    // int length_of_the_string = userchoice.length();
+                    System.out.println(userchoice);// .substring(23, length_of_the_string));
                     canAnimalsMate = true;
                 }
             } else {
@@ -90,40 +162,40 @@ public class Player {
     public void mateAnimals(String pet) {
         switch (pet) {
             case "dog":
-                Dog maleDog = (Dog) userAnimal("Dog", "m");
-                Dog femaleDog = (Dog) userAnimal("Dog", "f");
+                Dog maleDog = (Dog) userAnimal(AnimalType.DOG, "m");
+                Dog femaleDog = (Dog) userAnimal(AnimalType.DOG, "f");
                 Animal newdog = maleDog.mate(femaleDog);
                 if (newdog != null) {
                     UserAnimalList.add(newdog);
                 }
                 break;
             case "cat":
-                Cat maleCat = (Cat) userAnimal("Cat", "m");
-                Cat femaleCat = (Cat) userAnimal("Cat", "f");
+                Cat maleCat = (Cat) userAnimal(AnimalType.CAT, "m");
+                Cat femaleCat = (Cat) userAnimal(AnimalType.CAT, "f");
                 Animal newcat = maleCat.mate(femaleCat);
                 if (newcat != null) {
                     UserAnimalList.add(newcat);
                 }
                 break;
             case "horse":
-                Horse maleHorse = (Horse) userAnimal("Horse", "m");
-                Horse femaleHorse = (Horse) userAnimal("Horse", "f");
+                Horse maleHorse = (Horse) userAnimal(AnimalType.HORSE, "m");
+                Horse femaleHorse = (Horse) userAnimal(AnimalType.HORSE, "f");
                 Animal newhorse = maleHorse.mate(femaleHorse);
                 if (newhorse != null) {
                     UserAnimalList.add(newhorse);
                 }
                 break;
             case "rabbit":
-                Rabbit maleRabbit = (Rabbit) userAnimal("Rabbit", "m");
-                Rabbit femaleRabbit = (Rabbit) userAnimal("Rabbit", "f");
+                Rabbit maleRabbit = (Rabbit) userAnimal(AnimalType.RABBIT, "m");
+                Rabbit femaleRabbit = (Rabbit) userAnimal(AnimalType.RABBIT, "f");
                 Animal newrabbit = maleRabbit.mate(femaleRabbit);
                 if (newrabbit != null) {
                     UserAnimalList.add(newrabbit);
                 }
                 break;
             case "mouse":
-                Mouse maleMouse = (Mouse) userAnimal("Mouse", "m");
-                Mouse femaleMouse = (Mouse) userAnimal("Mouse", "f");
+                Mouse maleMouse = (Mouse) userAnimal(AnimalType.MOUSE, "m");
+                Mouse femaleMouse = (Mouse) userAnimal(AnimalType.MOUSE, "f");
                 Animal newmouse = maleMouse.mate(femaleMouse);
                 if (newmouse != null) {
                     UserAnimalList.add(newmouse);
@@ -149,12 +221,12 @@ public class Player {
             foodType = FoodEnum.Meat;
         }
         if (foodType.getKGFoodPrice() > (money * noOfkgsToBuy)) {
-            System.out.println("You don't have sufficient money to buy food.");
+            System.out.println("You don't have sufficient money to buy food.ddd");
         } else {
             int moneyToPay = foodType.getKGFoodPrice() * noOfkgsToBuy;
             Food food = store.buy(foodType, moneyToPay);
             if (food == null) {
-                System.out.println("You don't have sufficient money to buy food.");
+                System.out.println("You don't have sufficient money to buy food.lop");
             } else {
                 money = money - moneyToPay;
                 if (foodChoice == 1) {
@@ -176,6 +248,7 @@ public class Player {
     public void endOfRound() {
         Random rand = new Random();
         for (Animal animal : UserAnimalList) {
+            animal.setPreviousRoundHealth(animal.health);
             int randomNum = rand.nextInt((30 - 10) + 1) + 10;
             animal.health = animal.health - randomNum;
         }
@@ -183,64 +256,117 @@ public class Player {
     }
 
     public void feedAnimals() {
-        if(UserAnimalList.size() ==0) {
+        if (UserAnimalList.size() == 0) {
             System.out.println("You don't have animals to feed.");
         } else {
-            if(milkAvailable.getweightInKgs() == 0 && leavesAvailable.getweightInKgs() == 0
-                    && carrotsAvailable.getweightInKgs() == 0  &&chickenAvailable.getweightInKgs() == 0 &&meatAvailable.getweightInKgs() == 0 ) {
+            if (milkAvailable.getweightInKgs() == 0 && leavesAvailable.getweightInKgs() == 0
+                    && carrotsAvailable.getweightInKgs() == 0 && chickenAvailable.getweightInKgs() == 0
+                    && meatAvailable.getweightInKgs() == 0) {
                 System.out.println("You don't have food to feed the animals");
             } else {
                 userAnimalList();
                 System.out.println("You have the following food available:");
-                if(milkAvailable.getweightInKgs() > 0 ) {
-                    System.out.println("Milk in KGs:" +milkAvailable.getweightInKgs());
+                if (milkAvailable.getweightInKgs() > 0) {
+                    System.out.println("Milk in KGs:" + milkAvailable.getweightInKgs());
                 }
-                if(leavesAvailable.getweightInKgs() > 0 ) {
-                    System.out.println("Leaves in KGs:" +leavesAvailable.getweightInKgs());
+                if (leavesAvailable.getweightInKgs() > 0) {
+                    System.out.println("Leaves in KGs:" + leavesAvailable.getweightInKgs());
                 }
-                if(carrotsAvailable.getweightInKgs() > 0 ) {
-                    System.out.println("Carrots in KGs:" +carrotsAvailable.getweightInKgs());
+                if (carrotsAvailable.getweightInKgs() > 0) {
+                    System.out.println("Carrots in KGs:" + carrotsAvailable.getweightInKgs());
                 }
-                if(chickenAvailable.getweightInKgs() > 0 ) {
-                    System.out.println("Chicken in KGs:" +chickenAvailable.getweightInKgs());
+                if (chickenAvailable.getweightInKgs() > 0) {
+                    System.out.println("Chicken in KGs:" + chickenAvailable.getweightInKgs());
                 }
-                if(meatAvailable.getweightInKgs() > 0 ) {
-                    System.out.println("Meat in KGs:" +meatAvailable.getweightInKgs());
+                if (meatAvailable.getweightInKgs() > 0) {
+                    System.out.println("Meat in KGs:" + meatAvailable.getweightInKgs());
                 }
-                System.out.println("Which Animal you want to feed:");
+                System.out.println("Which Animal you want to feed(Enter name of animal):");
 
                 Scanner userInput = new Scanner(System.in);
                 String pet = userInput.next().toLowerCase();
-                System.out.println("What food you want to feed:");
-                String foodToFeed = userInput.next().toLowerCase();
+                Animal animalToFeed = null;
+                do {
+                    for(Animal animal:UserAnimalList) {
+                        if(animal.getName().equalsIgnoreCase(pet)) {
+                            animalToFeed = animal;
+                            break;
+                        }
+                    }
+                    if(animalToFeed == null) {
+                        System.out.println("Please enter a valid name of the animal.");
+                    }
 
+                } while (animalToFeed == null);
+                System.out.println("What food you want to feed:");
+                String foodSelected = userInput.next().toLowerCase();
+                String[] foods = animalToFeed.getAnimalType().getFoods();
+                boolean isMatchFound = false;
+                for(String food: foods){
+                    if(food.equalsIgnoreCase(foodSelected)) {
+                        isMatchFound = true;
+                        break;
+                    }
+                }
+                if(!isMatchFound) {
+                    System.out.println(pet + " cannot eat " + foodSelected + ". Please select again.");
+                    feedAnimals();
+                }
+                //pet
                 System.out.println("How many Kgs you want to feed:");
                 int kgsToFeed = userInput.nextInt();
-                //Food foodToFeed = new Food
-                switch (pet) {
-                    case "dog":
-
-                        break;
-                    case "cat":
-
-                        break;
-                    case "horse":
-
-                        break;
-                    case "rabbit":
-
-                        break;
-                    case "mouse":
-
-                        break;
-                    default:
-                        System.out.println("Please select animals from above list.");
+                Food foodToFeed = null;
+                if (foodSelected.equalsIgnoreCase("carrot")) {
+                    foodToFeed = new Carrot(kgsToFeed);
+                    getAnimal(pet).feed(foodToFeed);
+                    carrotsAvailable.reduceweightInKgs(kgsToFeed);
+                } else if (foodSelected.equalsIgnoreCase("milk")) {
+                    foodToFeed = new Milk(kgsToFeed);
+                    getAnimal(pet).feed(foodToFeed);
+                    milkAvailable.reduceweightInKgs(kgsToFeed);
+                } else if (foodSelected.equalsIgnoreCase("meat")) {
+                    foodToFeed = new Meat(kgsToFeed);
+                    getAnimal(pet).feed(foodToFeed);
+                    meatAvailable.reduceweightInKgs(kgsToFeed);
+                } else if (foodSelected.equalsIgnoreCase("chicken")) {
+                    foodToFeed = new Chicken(kgsToFeed);
+                    getAnimal(pet).feed(foodToFeed);
+                    chickenAvailable.reduceweightInKgs(kgsToFeed);
+                } else if (foodSelected.equalsIgnoreCase("leaves")) {
+                    foodToFeed = new Leaves(kgsToFeed);
+                    getAnimal(pet).feed(foodToFeed);
+                    leavesAvailable.reduceweightInKgs(kgsToFeed);
                 }
+                System.out.println("Animal feeding complete");
 
             }
         }
 
     }
 
+    private Animal getAnimal(String animalType) {
+        for(Animal animal : UserAnimalList) {
+            if (animal.getName().equalsIgnoreCase(animalType) && animal.getHealth() > 0.0f && animal.getHealth() < 100.0f) {
+                return animal;
+            }
+        }
+        return null;
+    }
+
+    public void informDeadAnimals() {
+        System.out.println("The following Animals are dead:");
+        int userAnimalListSize = UserAnimalList.size();
+
+        if (userAnimalListSize > 0) {
+            for (int i = 0; i < userAnimalListSize; i++) {
+                Animal animal = UserAnimalList.get(i);
+                if (animal.isDead()) {
+                    System.out.println(animal.getName() + ", gender=" + animal.getGender());
+                    UserAnimalList.remove(i);
+                }
+            }
+        }
+        System.out.println("\n\n");
+    }
 
 }

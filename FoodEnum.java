@@ -1,4 +1,4 @@
-package com.example.djurspelet;
+package djurspelet;
 
 public enum FoodEnum {
     Milk(10), Leaves(20), Carrot(10), Chicken(20), Meat(30);

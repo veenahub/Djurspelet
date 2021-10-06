@@ -1,4 +1,4 @@
-package com.example.djurspelet;
+package djurspelet;
 
 public abstract class Food {
 
@@ -16,5 +16,9 @@ public abstract class Food {
 
     public void addweightInKgs(int addKgs) {
         weightInKgs = weightInKgs + addKgs;
+    }
+
+    public void reduceweightInKgs(int addKgs) {
+        weightInKgs = weightInKgs - addKgs;
     }
 }

@@ -1,4 +1,5 @@
-package com.example.djurspelet;
+package djurspelet;
+
 
 public class Chicken extends Food {
 
